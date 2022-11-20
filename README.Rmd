@@ -16,7 +16,7 @@ library(clusterProfiler)
 #library(kableExtra)
 ```
 
-本基因集库来自于<https://yulab-smu.top/gson-files/>，由于没有WikiPathways的库，所以在Y叔的基础上进行了修改，并且使用最新的数据，本版的更新时期是2022年11月21日。
+本基因集库来自于https://swcyo.github.io/gson-file/，由于没有WikiPathways的库，所以在Y叔的基础上进行了修改，并且使用最新的数据，本版的更新时期是2022年11月21日。
 
 `gson`文件格式是在CRAN R包`r CRANpkg("gson")`中提取的。
 
@@ -29,12 +29,12 @@ library(clusterProfiler)
 ```{r echo=FALSE}
 # build gsonDf
 files <- list.files(pattern = "\\.gson$")
-fileDownload <- paste0("https://yulab-smu.top/gson-files/", files)
+fileDownload <- paste0("https://swcyo.github.io/gson-file/", files)
 #icon <- paste0(icons::icon_style(icons::fontawesome("download"), fill='red'))
 #icon <- paste0(icons::fontawesome("download", style = "solid"))
 icon <- 'img/download-solid.svg'
 #url <- glue::glue("[![]({icon})]({fileDownload})")
-url <- glue::glue('[<img src="https://yulab-smu.top/gson-files/{icon}" width="30"/>]({fileDownload})')
+url <- glue::glue('[<img src="https://swcyo.github.io/gson-file/{icon}" width="30"/>]({fileDownload})')
 
 library(gson)
 gs <- lapply(files, read.gson)
