@@ -1,0 +1,105 @@
+---
+title: "富集分析GSON基因集库"
+author: "YuLab-SMU，Song Ou-Yang modified"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+  pdf_document:
+    toc: true
+---
+
+```{r echo=FALSE, results="hide", message=FALSE, warning=FALSE}
+library(yulab.utils)
+library(gson)
+library(clusterProfiler)
+#library(kableExtra)
+```
+
+本基因集库来自于<https://yulab-smu.top/gson-files/>，由于没有WikiPathways的库，所以在Y叔的基础上进行了修改，并且使用最新的数据，本版的更新时期是2022年11月21日。
+
+`gson`文件格式是在CRAN R包`r CRANpkg("gson")`中提取的。
+
+此格式旨在存储具有相关信息（例如基因集名称、版本、物种等）的基因集。
+
+`r CRANpkg("gson")` 包提供了一组用于读取、写入和处理`gson`文件的实用程序。
+
+以下是以`gson`格式存储的基因集库：
+
+```{r echo=FALSE}
+# build gsonDf
+files <- list.files(pattern = "\\.gson$")
+fileDownload <- paste0("https://yulab-smu.top/gson-files/", files)
+#icon <- paste0(icons::icon_style(icons::fontawesome("download"), fill='red'))
+#icon <- paste0(icons::fontawesome("download", style = "solid"))
+icon <- 'img/download-solid.svg'
+#url <- glue::glue("[![]({icon})]({fileDownload})")
+url <- glue::glue('[<img src="https://yulab-smu.top/gson-files/{icon}" width="30"/>]({fileDownload})')
+
+library(gson)
+gs <- lapply(files, read.gson)
+geneSet <- vapply(gs, function(x) x@gsname, character(1))
+species <- vapply(gs, function(x) x@species, character(1))
+ver <- vapply(gs, function(x) {
+    res <- x@version
+    if (length(res) == 0) {
+        return(" ")
+    }
+    return(res)
+}, character(1))
+
+ngs <- vapply(gs, function(x) length(unique(x@gsid2gene$gsid)), numeric(1))
+ng <- vapply(gs, function(x) length(unique(x@gsid2gene$gene)), numeric(1))
+
+d <- tibble::tibble(`Gene Set` = geneSet,
+                Terms = ngs,
+                `Gene Coverage` = ng,
+                Species = species,
+                Version = ver,
+                URL = url)
+
+
+
+#library(kableExtra)
+#d %>%
+#  knitr::kable() #%>%
+  #kable_styling()
+  #kable_material(c("striped", "hover")) %>%
+
+knitr::kable(d)  
+```
+
+用户可以下载该文件并将其用作`r Biocpkg("clusterProfiler")`包中的背景注释，用以运行富集分析。
+
+-   获取在线gson的代码如下：
+
+```{=html}
+<!-- -->
+```
+    # GO
+    library(clusterProfiler)
+    library(org.Hs.eg.db)
+    library(gson)
+    gson_BP_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "BP")
+    gson_MF_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "MF")
+    gson_CC_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "CC")
+    gson_ALL_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "ALL")
+    write.gson(gson_BP_human, file = "GO_BP_human.gson")
+    write.gson(gson_MF_human, file = "GO_MF_human.gson")
+    write.gson(gson_CC_human, file = "GO_CC_human.gson")
+    write.gson(gson_ALL_human, file = "GO_ALL_human.gson")
+
+    # KEGG
+    KEGG_human <- gson_KEGG(species = "hsa", KEGG_Type="KEGG", keyType="kegg") 
+    MKEGG_human <- gson_KEGG(species = "hsa", KEGG_Type="MKEGG", keyType="kegg") 
+    write.gson(KEGG_human, file = "KEGG_human.gson")
+    write.gson(MKEGG_human, file = "MKEGG_human.gson")
+
+    # WikiPathways
+    WikiPathways_human <- gson_WP("Homo sapiens") 
+    write.gson(WikiPathways_human, file = "WikiPathways_human.gson")
+
+    # Reactome
+    library(ReactomePA)
+    Reactome_human <- gson_Reactome(organism = "human")
+    write.gson(Reactome_human, file = "Reactome_human.gson")
