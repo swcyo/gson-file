@@ -14,7 +14,9 @@ library(clusterProfiler)
 #library(kableExtra)
 ```
 
-本基因集库来自于<https://yulab-smu.top/gson-files/>，由于他的库里没有补上WikiPathways的库，所以在Y叔的基础上进行了修改，并且使用最新的数据，本版的更新时期是2022年11月21日。
+本基因集库来自于<https://yulab-smu.top/gson-files/>，由于他的库里没有补充**WikiPathways**的数据，所以我在Y叔的基础上进行了修改，并且爬取了最新的数据。
+
+  > 本版的更新时期是**2023年12月24日**。
 
 `gson`文件格式是在CRAN R包`r CRANpkg("gson")`中提取的。
 
