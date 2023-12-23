@@ -3,10 +3,10 @@ title: "富集分析GSON基因集库"
 author: "YuLab-SMU，Song Ou-Yang modified"
 output:
   prettydoc::html_pretty:
-    theme: architect
-    highlight: github
+theme: architect
+highlight: github
   pdf_document:
-    toc: true
+toc: true
 ---
 
 ```{r echo=FALSE, results="hide", message=FALSE, warning=FALSE}
@@ -41,22 +41,22 @@ gs <- lapply(files, read.gson)
 geneSet <- vapply(gs, function(x) x@gsname, character(1))
 species <- vapply(gs, function(x) x@species, character(1))
 ver <- vapply(gs, function(x) {
-    res <- x@version
-    if (length(res) == 0) {
-        return(" ")
-    }
-    return(res)
+res <- x@version
+if (length(res) == 0) {
+return(" ")
+}
+return(res)
 }, character(1))
 
 ngs <- vapply(gs, function(x) length(unique(x@gsid2gene$gsid)), numeric(1))
 ng <- vapply(gs, function(x) length(unique(x@gsid2gene$gene)), numeric(1))
 
 d <- tibble::tibble(`Gene Set` = geneSet,
-                Terms = ngs,
-                `Gene Coverage` = ng,
-                Species = species,
-                Version = ver,
-                URL = url)
+Terms = ngs,
+`Gene Coverage` = ng,
+Species = species,
+Version = ver,
+URL = url)
 
 
 
@@ -73,33 +73,32 @@ knitr::kable(d)
 
 -   获取在线gson的代码如下：
 
-```{=html}
-<!-- -->
+```         
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(gson)
+# GO
+gson_BP_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "BP")
+gson_MF_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "MF")
+gson_CC_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "CC")
+gson_ALL_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "ALL")
+write.gson(gson_BP_human, file = "GO_BP_human.gson")
+write.gson(gson_MF_human, file = "GO_MF_human.gson")
+write.gson(gson_CC_human, file = "GO_CC_human.gson")
+write.gson(gson_ALL_human, file = "GO_ALL_human.gson")
+
+# KEGG
+KEGG_human <- gson_KEGG(species = "hsa", KEGG_Type="KEGG", keyType="kegg") 
+MKEGG_human <- gson_KEGG(species = "hsa", KEGG_Type="MKEGG", keyType="kegg") 
+write.gson(KEGG_human, file = "KEGG_human.gson")
+write.gson(MKEGG_human, file = "MKEGG_human.gson")
+
+# WikiPathways
+WikiPathways_human <- gson_WP("Homo sapiens") 
+write.gson(WikiPathways_human, file = "WikiPathways_human.gson")
+
+# Reactome
+library(ReactomePA)
+Reactome_human <- gson_Reactome(organism = "human")
+write.gson(Reactome_human, file = "Reactome_human.gson")
 ```
-    # GO
-    library(clusterProfiler)
-    library(org.Hs.eg.db)
-    library(gson)
-    gson_BP_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "BP")
-    gson_MF_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "MF")
-    gson_CC_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "CC")
-    gson_ALL_human <- gson_GO(OrgDb = org.Hs.eg.db, keytype = 'ENTREZID', ont = "ALL")
-    write.gson(gson_BP_human, file = "GO_BP_human.gson")
-    write.gson(gson_MF_human, file = "GO_MF_human.gson")
-    write.gson(gson_CC_human, file = "GO_CC_human.gson")
-    write.gson(gson_ALL_human, file = "GO_ALL_human.gson")
-
-    # KEGG
-    KEGG_human <- gson_KEGG(species = "hsa", KEGG_Type="KEGG", keyType="kegg") 
-    MKEGG_human <- gson_KEGG(species = "hsa", KEGG_Type="MKEGG", keyType="kegg") 
-    write.gson(KEGG_human, file = "KEGG_human.gson")
-    write.gson(MKEGG_human, file = "MKEGG_human.gson")
-
-    # WikiPathways
-    WikiPathways_human <- gson_WP("Homo sapiens") 
-    write.gson(WikiPathways_human, file = "WikiPathways_human.gson")
-
-    # Reactome
-    library(ReactomePA)
-    Reactome_human <- gson_Reactome(organism = "human")
-    write.gson(Reactome_human, file = "Reactome_human.gson")
